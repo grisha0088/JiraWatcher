@@ -196,8 +196,8 @@ namespace DutyBot
                                 repository.Create(logReccord);
                                 continue; //прерываю цикл foreach
                             }
-
-                            var links = issue.fields.issuelinks; //здесь уже метки watch у тикета нет   
+                            //здесь уже метки watch у тикета нет
+                            var links = issue.fields.issuelinks;    //смотрю, есть ли линки у тикета
                             if (links != null)
                             {
                                 int countOfLinks = links.Count; //суммарное количество ссылок

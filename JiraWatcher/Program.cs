@@ -17,11 +17,11 @@ namespace DutyBot
             {
                 x.Service<Prog>(s =>
                 {
-                    s.ConstructUsing(name => new Prog());
-                    s.WhenStarted(tc => tc.Start());   
-                    s.WhenStopped(tc => tc.Stop());
+                    s.ConstructUsing(name => new Prog());  //создаём службу из класса Prog
+                    s.WhenStarted(tc => tc.Start());   //говорим, какой метод будет при старте службы
+                    s.WhenStopped(tc => tc.Stop());  //говорим, какой метод выполнится при остановке службы
                 });
-                x.RunAsNetworkService();
+                x.RunAsNetworkService();  //указываем свойства службы
                 x.SetDescription("Service for JIRA. Adds lable watch when all linked issues closed");
                 x.SetDisplayName("JiraWatcher");
                 x.SetServiceName("JiraWatcher");
@@ -58,29 +58,27 @@ namespace DutyBot
                 catch (Exception ex)
                 {
                     Thread.Sleep(60000); // еcли не доступна БД и не получается залогировать запуск, ждём 60 секунд и пробуем еще раз.
-                    using (var repository = new Repository<DbContext>())
+                    using (var repository = new Repository<DbContext>())  //использую репозиторий для работы с БД, какая будет БД указано в DbContext
                     {
-                        var exReccord = new Log
+                        repository.Create(new Log   //создаю объект Log и пишу его в БД
                         {
                             Date = DateTime.Now,
                             MessageTipe = "error",
                             Operation = "StartService",
                             Exception = ex.GetType() + ": " + ex.Message
-                        };
-                        repository.Create(exReccord);
-                        var logReccord = new Log
+                        });
+                        repository.Create(new Log
                         {
                             Date = DateTime.Now,
                             MessageTipe = "info",
                             Operation = "StartService2Attemp",
                             Exception = ""
-                        };
-                        repository.Create(logReccord);
+                        });
                     }
 
                 }
 
-                using (var repository = new Repository<DbContext>()) //инициализирую парамтры приложения
+                using (var repository = new Repository<DbContext>()) //инициализирую парамтры приложения из БД
                 {
                     jiraParam = repository.Get<Parametr>(p => p.Name == "jira");
                     userLoginParam = repository.Get<Parametr>(p => p.Name == "dafaultuserlogin");
@@ -112,14 +110,13 @@ namespace DutyBot
             {
                 using (var repository = new Repository<DbContext>())
                 {
-                    var logReccord = new Log
+                    repository.Create(new Log
                     {
                         Date = DateTime.Now,
                         MessageTipe = "info",
                         Operation = "StopService",
                         Exception = "",
-                    };
-                    repository.Create(logReccord);
+                    });
                 }
                 Thread.ResetAbort();
             }
@@ -127,14 +124,13 @@ namespace DutyBot
             {
                 using (var repository = new Repository<DbContext>())
                 {
-                    var logReccord = new Log
+                    repository.Create(new Log
                     {
                         Date = DateTime.Now,
                         MessageTipe = "fatal",
                         Operation = "StopService",
                         Exception = ex.GetType() + ": " + ex.Message
-                    };
-                    repository.Create(logReccord);
+                    });
                 }
             }
         }
@@ -204,33 +200,34 @@ namespace DutyBot
                             var links = issue.fields.issuelinks; //здесь уже метки watch у тикета нет   
                             if (links != null)
                             {
+                                int countOfLinks = links.Count; //суммарное количество ссылок
+                                int countOfClosedLinks = 0; //количество ссылок на закрытые тикеты
+
                                 foreach (var link in links)
                                 {
-                                    var inwardIssue = link.inwardIssue;
+                                    var inwardIssue = link.inwardIssue;  //есть входящие и исходящие связи в тикете
                                     var outwardIssue = link.outwardIssue;
-                                    int countOfLinks = links.Count; //суммарное количество ссылок
-                                    int countOfClosedLinks = 0; //количество ссылок на закрытые тикеты
 
-                                    if (inwardIssue.id != null)
+                                    if (link.inwardIssue.id != null)  //считаем входящие связи с закрытыми тикетами
                                     {
                                         var ticket = jira.LoadIssue(inwardIssue);
-                                        if (ticket.fields.status.name == "Закрыто")
+                                        if (ticket.fields.status.name == "Закрыто" || ticket.fields.status.name == "Решено")
                                         {
                                             countOfClosedLinks++;
                                         }
                                     }
-                                    if (outwardIssue.id != null)
+                                    if (link.outwardIssue.id != null)  //считаем исходящие связи с закрытыми тикетами
                                     {
                                         var ticket = jira.LoadIssue(outwardIssue);
-                                        if (ticket.fields.status.name == "Закрыто")
+                                        if (ticket.fields.status.name == "Закрыто" || ticket.fields.status.name == "Решено")
                                         {
                                             countOfClosedLinks++;
                                         }
                                     }
-                                    if (countOfLinks == countOfClosedLinks)
+                                    if (countOfLinks == countOfClosedLinks)  //смотрим что суммарное количество линков равно сумме линков к решёнными и закрытым тикетам
                                     {
                                         issue.fields.labels.Add("watch");
-                                        jira.CreateComment(issue, "Все связанные тикеты на команду разработки были закрыты." + Environment.NewLine + "Необходимо убедиться, что проблема решена и закрыть данный тикет, сообщив пользователю, когда исправление будет в релизе.",
+                                        jira.CreateComment(issue, "Все связанные тикеты на команду разработки были решены или закрыты." + Environment.NewLine + "Необходимо убедиться, что проблема решена и закрыть данный тикет, сообщив пользователю, когда исправление будет в релизе.",
                                             new Visibility {type = "role", value = "Service Desk Team"});
                                         jira.UpdateIssue(issue);
                                         repository.Create(new Log

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Управление общими сведениями о сборке осуществляется с помощью 
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
-[assembly: AssemblyTitle("DutyBot")]
+[assembly: AssemblyTitle("JiraWatcher")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("DutyBot")]
-[assembly: AssemblyProduct("DutyBot")]
+[assembly: AssemblyCompany("JiraWatcher")]
+[assembly: AssemblyProduct("JiraWatcher")]
 [assembly: AssemblyCopyright("Copyright © g.dementiev@2gis.ru")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

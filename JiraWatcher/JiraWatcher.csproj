@@ -7,8 +7,8 @@
     <ProjectGuid>{E8450CC5-9AC7-42F2-9936-B06E8BFA4AEB}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DutyBot</RootNamespace>
-    <AssemblyName>DutyBot</AssemblyName>
+    <RootNamespace>JiraWatcher</RootNamespace>
+    <AssemblyName>JiraWatcher</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

@@ -155,7 +155,7 @@ namespace DutyBot
                     int cnt = 0; //количество тикетов в Escallation
                     try
                     {
-                        issues = jira.EnumerateIssuesByQuery(filterParam.Value, null, 0);
+                        issues = jira.EnumerateIssuesByQuery(filterParam.Value, null, 0).ToList();
                         cnt = issues.Count();
                     }
                     catch (Exception ex)
@@ -177,8 +177,7 @@ namespace DutyBot
                         Operation = "Получено тикетов " + cnt,
                         Exception = ""
                     });
-                   
-
+                    
                     foreach (var issue in issues) //смотрю все тикеты
                     {
                         try

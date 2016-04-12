@@ -86,8 +86,9 @@ namespace DutyBot
                     userPasswordParam = repository.Get<Parametr>(p => p.Name == "dafaultuserpassword");
                     filterParam = repository.Get<Parametr>(p => p.Name == "Filter");
                 }
-                Task.WhenAll(CheckJira()); //метод в бесконечном цикле будет проверять jira 
-
+                //метод в бесконечном цикле будет проверять jira 
+                Task tsk = new Task(CheckJira);
+                tsk.Start();
             }
             catch (Exception ex)
             {
@@ -135,7 +136,7 @@ namespace DutyBot
             }
         }
 
-        async Task CheckJira()
+        void CheckJira()
         {
             using (var repository = new Repository<DbContext>()) //создаю репозиторий для работы с БД
             {
@@ -210,17 +211,18 @@ namespace DutyBot
                                     if (link.inwardIssue.id != null)  //считаем входящие связи с закрытыми тикетами
                                     {
                                         var ticket = jira.LoadIssue(inwardIssue);
-                                        if (((ticket.fields.status.name == "Закрыто" || ticket.fields.status.name == "Решено")&issue.fields.assignee.displayName!= "technologsupport")
-                                            | ((ticket.fields.status.name == "Закрыто") & issue.fields.assignee.displayName == "technologsupport"))
+                                        if (((ticket.fields.status.name == "Закрыто" || ticket.fields.status.name == "Решено")&issue.fields.assignee.name != "technologsupport")
+                                            | ((ticket.fields.status.name == "Закрыто") & issue.fields.assignee.name == "technologsupport"))
                                         {
                                             countOfClosedLinks++;
                                         }
                                     }
                                     if (link.outwardIssue.id != null)  //считаем исходящие связи с закрытыми тикетами
                                     {
-                                        var ticket = jira.LoadIssue(outwardIssue);
-                                        if (((ticket.fields.status.name == "Закрыто" || ticket.fields.status.name == "Решено") & issue.fields.assignee.displayName != "technologsupport")
-                                            | ((ticket.fields.status.name == "Закрыто") & issue.fields.assignee.displayName == "technologsupport"))
+                                           var ticket = jira.LoadIssue(outwardIssue);
+                                        if (((ticket.fields.status.name == "Закрыто" || ticket.fields.status.name == "Решено") 
+                                            & issue.fields.assignee.name != "technologsupport")
+                                            | ((ticket.fields.status.name == "Закрыто") & issue.fields.assignee.name == "technologsupport"))
                                         {
                                             countOfClosedLinks++;
                                         }
@@ -251,7 +253,7 @@ namespace DutyBot
                                     }
                                 }
                             }
-                            await Task.Delay(1000); //ждём секунду, чтобы не перенапряч jira 
+                            Thread.Sleep(1000); //ждём секунду, чтобы не перенапряч jira 
                         }
                         catch (Exception e)
                         {
@@ -264,7 +266,7 @@ namespace DutyBot
                             });
                         }
                     }
-                    await Task.Delay(10000); //ждём 10 секунд, прежде чем снова начать проверять все тикеты в Escalation
+                    Thread.Sleep(10000); //ждём 10 секунд, прежде чем снова начать проверять все тикеты в Escalation
                 }
             }
         } 

@@ -211,7 +211,7 @@ namespace DutyBot
                                     if (link.inwardIssue.id != null)  //считаем входящие связи с закрытыми тикетами
                                     {
                                         var ticket = jira.LoadIssue(inwardIssue);
-                                        if (((ticket.fields.status.name == "Закрыто" || ticket.fields.status.name == "Решено")&issue.fields.assignee.name != "technologsupport")
+                                        if (((ticket.fields.status.name == "Закрыто" || ticket.fields.status.name == "Решено" || ticket.fields.status.name == "Выпущено") &issue.fields.assignee.name != "technologsupport")
                                             | ((ticket.fields.status.name == "Закрыто") & issue.fields.assignee.name == "technologsupport"))
                                         {
                                             countOfClosedLinks++;
@@ -220,7 +220,7 @@ namespace DutyBot
                                     if (link.outwardIssue.id != null)  //считаем исходящие связи с закрытыми тикетами
                                     {
                                            var ticket = jira.LoadIssue(outwardIssue);
-                                        if (((ticket.fields.status.name == "Закрыто" || ticket.fields.status.name == "Решено") 
+                                        if (((ticket.fields.status.name == "Закрыто" || ticket.fields.status.name == "Решено" || ticket.fields.status.name == "Выпущено") 
                                             & issue.fields.assignee.name != "technologsupport")
                                             | ((ticket.fields.status.name == "Закрыто") & issue.fields.assignee.name == "technologsupport"))
                                         {

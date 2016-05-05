@@ -140,10 +140,9 @@ namespace DutyBot
         {
             using (var repository = new Repository<DbContext>()) //создаю репозиторий для работы с БД
             {
+                var jira = new JiraClient(jiraParam.Value, userLoginParam.Value, userPasswordParam.Value); //объявляю клиент jira
                 while (true) //бесконечный цикл по проверке тикетов, переданных разработчикам
                 {
-
-                    var jira = new JiraClient(jiraParam.Value, userLoginParam.Value, userPasswordParam.Value); //объявляю клиент jira
                     repository.Create(new Log
                     {
                         Date = DateTime.Now,
@@ -164,8 +163,8 @@ namespace DutyBot
                         repository.Create(new Log
                         {
                             Date = DateTime.Now,
-                            MessageTipe = "info",
-                            Operation = "Не удалось получить тикеты из JIra",
+                            MessageTipe = "error",
+                            Operation = "Не удалось получить тикеты из Jira",
                             Exception = ex.Message
                         });
                         continue;  //прерываю щикл
@@ -184,16 +183,8 @@ namespace DutyBot
                         try
                         {
                             if (issue.fields.labels.Contains("watch"))
-                                //если есть метка watch пишу в лог и перехожу к следующему тикету
+                                //если есть метка watch перехожу к следующему тикету
                             {
-                                var logReccord = new Log
-                                {
-                                    Date = DateTime.Now,
-                                    MessageTipe = "info",
-                                    Operation = "Тикет " + issue.key + " уже имеет метку watch",
-                                    Exception = ""
-                                };
-                                repository.Create(logReccord);
                                 continue; //прерываю цикл foreach
                             }
                             //здесь уже метки watch у тикета нет
@@ -244,16 +235,6 @@ namespace DutyBot
                                             Date = DateTime.Now,
                                             MessageTipe = "info",
                                             Operation = "Тикету " + issue.key + " добавлена метка watch",
-                                            Exception = ""
-                                        });
-                                    }
-                                    else
-                                    {
-                                        repository.Create(new Log
-                                        {
-                                            Date = DateTime.Now,
-                                            MessageTipe = "info",
-                                            Operation = "Тикет " + issue.key + " связан с открытым тиктетом",
                                             Exception = ""
                                         });
                                     }

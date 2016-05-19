@@ -226,6 +226,8 @@ namespace DutyBot
                                     }
                                     if (countOfLinks == countOfClosedLinks)  //смотрим что суммарное количество линков равно сумме линков к решёнными и закрытым тикетам
                                     {
+                                        //у тикета нет метода Refresh, поэтому я смотрю, что его статус всё еще Решён
+                                        if (jira.EnumerateIssuesByQuery("key = " + issue.key, null, 0).FirstOrDefault().fields.status.name == "Решено") continue;
                                         issue.fields.labels.Add("watch");
                                         jira.CreateComment(issue, "Все связанные тикеты на команду разработки были решены или закрыты." + Environment.NewLine + "Необходимо убедиться, что проблема решена и закрыть данный тикет, сообщив пользователю, когда исправление будет в релизе.",
                                             new Visibility {type = "role", value = "Service Desk Team"});

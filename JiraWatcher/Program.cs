@@ -206,8 +206,8 @@ namespace DutyBot
                                             ((ticket.fields.status.name == "Закрыто" || ticket.fields.status.name == "Решено" || ticket.fields.status.name == "Выпущено")&issue.fields.assignee.name != "technologsupport" & !ticket.key.Contains("WAPI"))
                                             | ((ticket.fields.status.name == "Закрыто") & issue.fields.assignee.name == "technologsupport")
                                             | (ticket.key.Contains("WAPI") & ticket.fields.status.name == "Выпущено")
-                                            | (ticket.key.Contains("ONLINE") & ticket.fields.status.name == "Выпущено")
                                             | (ticket.key.Contains("OLAP") & ticket.fields.status.name == "Выпущено")
+                                            | (ticket.key.Contains("ONLINE") & ticket.fields.status.name == "Выпущено")
                                            )
                                         {
                                             countOfClosedLinks++;
@@ -220,8 +220,8 @@ namespace DutyBot
                                             && issue.fields.assignee.name != "technologsupport" && !ticket.key.Contains("WAPI") && !ticket.key.Contains("ONLINE") && !ticket.key.Contains("OLAP"))
                                             || ((ticket.fields.status.name == "Закрыто") && issue.fields.assignee.name == "technologsupport")
                                             || (ticket.key.Contains("WAPI") && ticket.fields.status.name == "Выпущено")
-                                            || (ticket.key.Contains("ONLINE") && ticket.fields.status.name == "Выпущено")
                                             || (ticket.key.Contains("OLAP") && ticket.fields.status.name == "Выпущено")
+                                            || (ticket.key.Contains("ONLINE") && ticket.fields.status.name == "Выпущено")
                                             )
                                         {
                                             countOfClosedLinks++;

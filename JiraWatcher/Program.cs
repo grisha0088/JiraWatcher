@@ -202,13 +202,10 @@ namespace DutyBot
                                     if (link.inwardIssue.id != null)  //считаем входящие связи с закрытыми тикетами
                                     {
                                         var ticket = jira.LoadIssue(inwardIssue);
-                                        if (
-                                            ((ticket.fields.status.name == "Закрыто" || ticket.fields.status.name == "Решено" || ticket.fields.status.name == "Выпущено")&issue.fields.assignee.name != "technologsupport" & !ticket.key.Contains("WAPI"))
-                                            | ((ticket.fields.status.name == "Закрыто") & issue.fields.assignee.name == "technologsupport")
-                                            | (ticket.key.Contains("WAPI") & ticket.fields.status.name == "Выпущено")
-                                            | (ticket.key.Contains("OLAP") & ticket.fields.status.name == "Выпущено")
-                                            | (ticket.key.Contains("ONLINE") & ticket.fields.status.name == "Выпущено")
-                                           )
+                                        if ((!ticket.key.Contains("WAPI") && !ticket.key.Contains("OLAP") && !ticket.key.Contains("ONLINE") && ticket.fields.status.name == "Закрыто")
+                                            || (ticket.key.Contains("WAPI") && ticket.fields.status.name == "Выпущено")
+                                            || (ticket.key.Contains("OLAP") && ticket.fields.status.name == "Выпущено")
+                                            || (ticket.key.Contains("ONLINE") && ticket.fields.status.name == "Выпущено"))
                                         {
                                             countOfClosedLinks++;
                                         }
@@ -216,13 +213,10 @@ namespace DutyBot
                                     if (link.outwardIssue.id != null)  //считаем исходящие связи с закрытыми тикетами
                                     {
                                            var ticket = jira.LoadIssue(outwardIssue);
-                                        if (((ticket.fields.status.name == "Закрыто" || ticket.fields.status.name == "Решено" || ticket.fields.status.name == "Выпущено")
-                                            && issue.fields.assignee.name != "technologsupport" && !ticket.key.Contains("WAPI") && !ticket.key.Contains("ONLINE") && !ticket.key.Contains("OLAP"))
-                                            || ((ticket.fields.status.name == "Закрыто") && issue.fields.assignee.name == "technologsupport")
+                                        if ( (!ticket.key.Contains("WAPI") && !ticket.key.Contains("OLAP") && !ticket.key.Contains("ONLINE") && ticket.fields.status.name == "Закрыто")
                                             || (ticket.key.Contains("WAPI") && ticket.fields.status.name == "Выпущено")
                                             || (ticket.key.Contains("OLAP") && ticket.fields.status.name == "Выпущено")
-                                            || (ticket.key.Contains("ONLINE") && ticket.fields.status.name == "Выпущено")
-                                            )
+                                            || (ticket.key.Contains("ONLINE") && ticket.fields.status.name == "Выпущено"))
                                         {
                                             countOfClosedLinks++;
                                         }

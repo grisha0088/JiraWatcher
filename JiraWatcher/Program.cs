@@ -196,47 +196,54 @@ namespace DutyBot
 
                                 foreach (var link in links)
                                 {
-                                    var inwardIssue = link.inwardIssue;  //есть входящие и исходящие связи в тикете
+                                    var inwardIssue = link.inwardIssue; //есть входящие и исходящие связи в тикете
                                     var outwardIssue = link.outwardIssue;
 
-                                    if (link.inwardIssue.id != null)  //считаем входящие связи с закрытыми тикетами
+                                    if (link.inwardIssue.id != null) //считаем входящие связи с закрытыми тикетами
                                     {
                                         var ticket = jira.LoadIssue(inwardIssue);
-                                        if ((!ticket.key.Contains("WAPI") && !ticket.key.Contains("OLAP") && !ticket.key.Contains("ONLINE") && ticket.fields.status.name == "Закрыто")
-                                            || (ticket.key.Contains("WAPI") && ticket.fields.status.name == "Выпущено")
+                                        if ((!ticket.key.Contains("WAPI") && !ticket.key.Contains("OLAP") &&
+                                             !ticket.key.Contains("ONLINE") && ticket.fields.status.name == "Закрыто")
+                                            || (ticket.key.Contains("WAPI") && ticket.fields.status.name == "Закрыто")
                                             || (ticket.key.Contains("OLAP") && ticket.fields.status.name == "Выпущено")
                                             || (ticket.key.Contains("ONLINE") && ticket.fields.status.name == "Выпущено"))
                                         {
                                             countOfClosedLinks++;
                                         }
                                     }
-                                    if (link.outwardIssue.id != null)  //считаем исходящие связи с закрытыми тикетами
+                                    if (link.outwardIssue.id != null) //считаем исходящие связи с закрытыми тикетами
                                     {
-                                           var ticket = jira.LoadIssue(outwardIssue);
-                                        if ( (!ticket.key.Contains("WAPI") && !ticket.key.Contains("OLAP") && !ticket.key.Contains("ONLINE") && ticket.fields.status.name == "Закрыто")
-                                            || (ticket.key.Contains("WAPI") && ticket.fields.status.name == "Выпущено")
+                                        var ticket = jira.LoadIssue(outwardIssue);
+                                        if ((!ticket.key.Contains("WAPI") && !ticket.key.Contains("OLAP") &&
+                                             !ticket.key.Contains("ONLINE") && ticket.fields.status.name == "Закрыто")
+                                            || (ticket.key.Contains("WAPI") && ticket.fields.status.name == "Закрыто")
                                             || (ticket.key.Contains("OLAP") && ticket.fields.status.name == "Выпущено")
                                             || (ticket.key.Contains("ONLINE") && ticket.fields.status.name == "Выпущено"))
                                         {
                                             countOfClosedLinks++;
                                         }
                                     }
-                                    if (countOfLinks == countOfClosedLinks)  //смотрим что суммарное количество линков равно сумме линков к решёнными и закрытым тикетам
+                                }
+                                if (countOfLinks == countOfClosedLinks)
+                                    //смотрим что суммарное количество линков равно сумме линков к решёнными и закрытым тикетам
+                                {
+                                    //у тикета нет метода Refresh, поэтому я смотрю, что его статус всё еще Решён
+                                    if (jira.EnumerateIssuesByQuery("key = " + issue.key, null, 0)
+                                            .FirstOrDefault()
+                                            .fields.status.name == "Решено") continue;
+                                    issue.fields.labels.Add("watch");
+                                    jira.CreateComment(issue,
+                                        "Все связанные тикеты на команду разработки были решены или закрыты." +
+                                        Environment.NewLine +
+                                        "Необходимо убедиться, что проблема решена и закрыть данный тикет, сообщив пользователю, когда исправление будет в релизе.",
+                                        new Visibility {type = "role", value = "Service Desk Collaborators" });
+                                    repository.Create(new Log
                                     {
-                                        //у тикета нет метода Refresh, поэтому я смотрю, что его статус всё еще Решён
-                                        if (jira.EnumerateIssuesByQuery("key = " + issue.key, null, 0).FirstOrDefault().fields.status.name == "Решено") continue;
-                                        issue.fields.labels.Add("watch");
-                                        jira.CreateComment(issue, "Все связанные тикеты на команду разработки были решены или закрыты." + Environment.NewLine + "Необходимо убедиться, что проблема решена и закрыть данный тикет, сообщив пользователю, когда исправление будет в релизе.",
-                                            new Visibility {type = "role", value = "Service Desk Team"});
-                                        jira.UpdateIssue(issue);
-                                        repository.Create(new Log
-                                        {
-                                            Date = DateTime.Now,
-                                            MessageTipe = "info",
-                                            Operation = "Тикету " + issue.key + " добавлена метка watch",
-                                            Exception = ""
-                                        });
-                                    }
+                                        Date = DateTime.Now,
+                                        MessageTipe = "info",
+                                        Operation = "Тикету " + issue.key + " добавлена метка watch",
+                                        Exception = ""
+                                    });
                                 }
                             }
                             Thread.Sleep(1000); //ждём секунду, чтобы не перенапряч jira 

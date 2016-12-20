@@ -204,7 +204,7 @@ namespace DutyBot
                                         var ticket = jira.LoadIssue(inwardIssue);
                                         if ((!ticket.key.Contains("WAPI") && !ticket.key.Contains("OLAP") &&
                                              !ticket.key.Contains("ONLINE") && ticket.fields.status.name == "Закрыто")
-                                            || (ticket.key.Contains("WAPI") && ticket.fields.status.name == "Закрыто")
+                                            || (ticket.key.Contains("WAPI") && ticket.fields.status.name == "Выпущено")
                                             || (ticket.key.Contains("OLAP") && ticket.fields.status.name == "Выпущено")
                                             || (ticket.key.Contains("ONLINE") && ticket.fields.status.name == "Выпущено"))
                                         {
@@ -216,7 +216,7 @@ namespace DutyBot
                                         var ticket = jira.LoadIssue(outwardIssue);
                                         if ((!ticket.key.Contains("WAPI") && !ticket.key.Contains("OLAP") &&
                                              !ticket.key.Contains("ONLINE") && ticket.fields.status.name == "Закрыто")
-                                            || (ticket.key.Contains("WAPI") && ticket.fields.status.name == "Закрыто")
+                                            || (ticket.key.Contains("WAPI") && ticket.fields.status.name == "Выпущено")
                                             || (ticket.key.Contains("OLAP") && ticket.fields.status.name == "Выпущено")
                                             || (ticket.key.Contains("ONLINE") && ticket.fields.status.name == "Выпущено"))
                                         {
